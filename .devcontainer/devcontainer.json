@@ -7,19 +7,26 @@
       "extensions": [
         "ms-python.python",
         "ms-python.vscode-pylance",
-        "ms-toolsai.jupyter"
+        "ms-toolsai.jupyter",
+        "aprosopo.auto-zen"
       ],
       "settings": {
         "python.defaultInterpreterPath": "/usr/local/bin/python",
 
-        "workbench.startupEditor": "readme",
-        "workbench.readme.path": "src/optimization.ipynb",
-
-        "workbench.view.main.visible": false,
-        "workbench.activityBar.location": "hidden"
+        "workbench.startupEditor": "none",
+        "workbench.editors.defaultBinaryEditor": "jupyter-notebook",
+        
+        "workbench.zenMode.silentNotifications": true,
+        "workbench.zenMode.hideActivityBar": true,
+        "workbench.zenMode.hideStatusBar": true,
+        "workbench.zenMode.hideLineNumbers": false,
+        "workbench.zenMode.fullScreen": false,
+        
+        "aprosopo.auto-zen": true
       }
     }
   },
 
+  "postAttachCommand": "code lab_notebook.ipynb",
   "postCreateCommand": "pip3 install --user -r .devcontainer/requirements.txt"
 }
