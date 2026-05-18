@@ -1,0 +1,25 @@
+{
+  "name": "Journee des Gymnasiens",
+  "image": "mcr.microsoft.com/devcontainers/python:3.13",
+  
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+
+        "workbench.startupEditor": "readme",
+        "workbench.readme.path": "lab_notebook.ipynb",
+
+        "workbench.view.main.visible": false,
+        "workbench.activityBar.location": "hidden"
+      }
+    }
+  },
+
+  "postCreateCommand": "pip3 install --user -r .devcontainer/requirements.txt"
+}
