@@ -13,7 +13,7 @@
         "python.defaultInterpreterPath": "/usr/local/bin/python",
 
         "workbench.startupEditor": "readme",
-        "workbench.readme.path": "lab_notebook.ipynb",
+        "workbench.readme.path": "src/optimization.ipynb",
 
         "workbench.view.main.visible": false,
         "workbench.activityBar.location": "hidden"
