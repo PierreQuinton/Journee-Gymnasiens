@@ -1,1 +1,1 @@
-# Journ-e-Gymnasiens
+# Journée Gymnasiens
