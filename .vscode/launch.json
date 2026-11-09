@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Lab",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/lab_run.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/src"
+        }
+    ]
+}
