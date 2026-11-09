@@ -1,0 +1,181 @@
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage[margin=2.3cm]{geometry}
+\usepackage{enumitem}
+\usepackage{mathtools}
+
+\setlist{itemsep=2pt, topsep=4pt}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\fonction}[1]{\code{#1}}
+
+\title{\textbf{TP : entraîner un modèle par descente de gradient}}
+\author{Journée des Gymnasiens}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Objectif}
+
+Comme nous l'avons vu dans l'introduction ce matin, l'apprentissage
+automatique consiste à chercher des \emph{paramètres} (des nombres) qui
+rendent un \emph{modèle} (une fonction) le plus proche possible des
+données. Cette recherche repose sur trois ingrédients que nous avons
+déjà rencontrés :
+
+\begin{itemize}
+  \item un \textbf{modèle} : une fonction possédant des paramètres
+        $p_0, p_1, \dots$, que l'on ajuste pour qu'elle colle aux données ;
+  \item des \textbf{données} : des exemples $(x_i, y_i)$ que le modèle doit
+        reproduire ;
+  \item une fonction de \textbf{coût} (\emph{loss}) : un score qui mesure
+        l'écart entre les prédictions du modèle et les cibles $y_i$.
+        Il doit être grand quand le modèle se trompe beaucoup et petit quand
+        il colle bien aux données.
+\end{itemize}
+
+Et nous avons vu enfin comment trouver les paramètres automatiquement :
+la \textbf{descente de gradient}, qui à chaque étape modifie les
+paramètres dans le sens opposé au gradient du coût :
+\[
+  p \;\leftarrow\; p - \eta\, \nabla L(p)
+\]
+où $\eta$ est le \emph{taux d'apprentissage}.
+
+\medskip
+Dans ce TP, vous allez vivre cette expérience de l'intérieur, en
+programmant vous-même les trois briques. Le fichier \code{src/lab.py}
+ne contient que les \textbf{trois fonctions à compléter} :
+\fonction{model}, \fonction{loss} et \fonction{grad}. Pour l'instant elles
+ne font rien : elles ne renvoient que le symbole \code{...}. Tout le
+reste (données, vérifications automatiques, animation d'entraînement) est
+déjà écrit dans le lanceur \code{src/lab\_run.py}, qui importe vos trois
+fonctions.
+
+\medskip
+Après chaque modification, relancez le programme dans VS Code : appuyez
+sur \code{F5}. Le programme vérifie d'abord votre
+\fonction{model}, puis votre \fonction{loss}, puis votre \fonction{grad}, il lance ensuite l'animation
+d'entraînement : elle ne marchera qu'une fois les trois fonctions prêtes.
+En cas d'erreur, la vérification affiche la valeur attendue et la valeur
+obtenue, ainsi que la taille des tableaux.
+
+\section*{Étape 1 : le modèle \hfill \fonction{model}}
+
+Notre modèle est un polynôme de degré 3, paramétré par une liste
+\code{parameters} $= [p_0, p_1, p_2, p_3]$ :
+\[
+  f(x) \;=\; p_0 \;+\; p_1\,x \;+\; p_2\,x^2 \;+\; p_3\,x^3
+  \;=\; \sum_{k=0}^{3} p_k\,x^k .
+\]
+Le coefficient à la position $k$ multiplie donc $x$ à la puissance $k$.
+
+\begin{enumerate}[label=\textbf{Q\arabic*.}]
+  \item Sans calcul : si \code{xs} contient $N$ valeurs, quelle est la
+        taille du tableau renvoyé par \fonction{model(parameters, xs)} ?
+  \item Implémentez \fonction{model}. L'opérateur \code{**} calcule les
+        puissances (\code{xs**2}, \code{xs**3}\ldots), et une boucle
+        \code{for k, p in enumerate(parameters)} itère sur chaque
+        coefficient $p_k$ avec son rang $k$ : Il faut donc multiplier \code{p} par
+        \code{xs**k}, et ensuite sommer les résultats.
+  \item Relancez le programme avec \code{F5} : si votre implémentation
+        est correcte, le message « \code{Le modèle a l'air bon.} »
+        s'affichera. La vérification teste plusieurs valeurs, y compris
+        un polynôme de degré plus élevé et plusieurs valeurs de $x$ à la
+        fois : votre implémentation doit aussi rester valable quand le
+        degré du polynôme ou le nombre de points est différent.
+\end{enumerate}
+
+\section*{Étape 2 : le coût \hfill \fonction{loss}}
+
+Comme vu ce matin, nous notons $L$ le \emph{coût} : le score du modèle
+pour un jeu de paramètres. Ici (comme dans la plupart des modèles à
+sortie numérique), nous prenons la moyenne des carrés des erreurs :
+\[
+  L(p) \;=\; \frac{1}{N}\,\Bigl( \bigl(f_p(x_1) - y_1\bigr)^2 + \cdots
+  + \bigl(f_p(x_N) - y_N\bigr)^2 \Bigr)
+  \;=\; \frac{1}{N} \sum_{i=1}^{N} \bigl( f_p(x_i) - y_i \bigr)^2 .
+\]
+
+\begin{enumerate}[label=\textbf{Q\arabic*.}, resume]
+  \item Que vaut $L$ si le modèle colle parfaitement aux données ? Et si
+        le modèle ne donne pas la bonne valeur au moindre point des
+        données, que peut-on dire de $L$ ?
+  \item Implémentez \fonction{loss(parameters, xs, ys)} : la moyenne des
+        carrés des différences entre les prédictions de votre
+        \fonction{model} et les cibles \code{ys}. Comme elle fait appel à
+        votre \fonction{model}, elle ne peut fonctionner qu'une fois l'étape 1
+        terminée. La boucle \code{for x, y in zip(xs, ys):} itère sur les
+        paires (valeur de $x$, cible $y$) du jeu de données ; il faut
+        ensuite sommer les carrés des différences, puis diviser par la
+        taille du jeu de données.
+  \item Relancez le programme avec \code{F5} : si vous ne vous êtes pas
+        trompé·e, le message « \code{Le coût a l'air bon.} » s'affichera.
+\end{enumerate}
+
+\section*{Étape 3 : le gradient \hfill \fonction{grad}}
+
+Nous avions vu ce matin que la descente de gradient demande de connaître
+la dérivée partielle $\dfrac{\partial L}{\partial p_i}$ pour chaque
+paramètre $p_i$ : de combien $L$ varie si l'on bouge $p_i$ d'une toute
+petite quantité. C'est sans doute la partie la plus mathématique du TP,
+mais nous allons la calculer \emph{élément par élément} : la collection de
+ces dérivées est le \textbf{gradient} $\nabla L$, il a une entrée par
+paramètre, et son $i$-ème élément est la dérivée de $L$ par rapport à
+$p_i$.
+
+\begin{enumerate}[label=\textbf{Q\arabic*.}, resume]
+  \item \emph{Sur papier : les résultats sont donnés, à vous de comprendre
+        pourquoi.} Pour un point de données $(x, y)$, posons
+        $u = f_p(x) - y$ (l'erreur du point). La règle de dérivation
+        des composées donne $\bigl(u^2\bigr)' = 2\,u\,u'$ :
+        \begin{enumerate}
+          \item Montrez que
+                \[
+                  \frac{\partial \bigl(u^2\bigr)}{\partial p_i}
+                  \;=\; 2\,u \times
+                  \frac{\partial f_p(x)}{\partial p_i}\,:
+                \]
+                pourquoi la cible $y$ disparaît de la dérivée ?
+          \item Prouvez que
+                \[
+                  \frac{\partial f_p(x)}{\partial p_i} \;=\; x^i\,:
+                \]
+                (dans $f_p(x) = p_0 + p_1\,x + p_2\,x^2 + \cdots$, seul
+                le terme en $p_i$ dépend de $p_i$.)
+          \item En déduire, en moyennant sur les $N$ points de données :
+                \[
+                  \frac{\partial L}{\partial p_i} \;=\; \frac{2}{N}
+                  \sum_{j=1}^{N} \bigl(f_p(x_j) - y_j\bigr)\,x_j^i\,.
+                \]
+        \end{enumerate}
+  \item Concrètement dans le code : le $i$-ème élément du gradient, à
+        savoir $\dfrac{\partial L}{\partial p_i}$, vaut la moyenne sur
+        les données de $2\,\bigl(f_p(x_j) - y_j\bigr)\,x_j^i$.
+        Implémentez \fonction{grad(parameters, xs, ys)} : la boucle
+        \code{for k in range(len(parameters)):} itère les rangs
+        $i$, et comme tout à l'heure
+        \code{for x, y in zip(xs, ys):} itère sur les paires (valeur de
+        $x$, cible $y$) du jeu de données. Pour chaque rang $k$, il faut
+        ensuite sommer les éléments, puis diviser par la taille du jeu
+        de données.
+\end{enumerate}
+
+\section*{Et maintenant : entraînez !}
+
+Maintenant que \fonction{model}, \fonction{loss} et \fonction{grad}
+existent, le programme \emph{s'entraîne} tout seul : partant des
+paramètres $p = (0, 0, 0, 0)$, il effectue 250 itérations de
+$p \leftarrow p - \eta\, \nabla L(p)$ et affiche l'animation
+d'entraînement (à gauche les données et les prédictions du modèle, à
+droite la courbe du coût).
+
+Faites tourner le programme avec \code{F5} et observez : le polynôme
+approxime les points de mieux en mieux. \textbf{Vous avez entraîné
+votre premier modèle ! Félicitation !}
+
+\end{document}
